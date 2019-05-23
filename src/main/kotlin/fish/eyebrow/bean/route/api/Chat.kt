@@ -12,7 +12,7 @@ private const val PATH = "/chat"
 
 fun Route.chat() {
     get(PATH) {
-        val result= transaction { Message.all().map { Message.Simple(it) } }
+        val result = transaction { Message.all().map { Message.Simple(it) } }
         val resultJson = Gson().toJson(result)
 
         call.respond(resultJson)
