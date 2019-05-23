@@ -1,7 +1,7 @@
 package fish.eyebrow.bean.util
 
 import com.typesafe.config.ConfigFactory
-import fish.eyebrow.bean.api
+import fish.eyebrow.bean.service
 import io.ktor.config.HoconApplicationConfig
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.createTestEnvironment
@@ -13,7 +13,7 @@ internal fun setupTestEngineWithConfiguration(path: String): TestApplicationEngi
         config = HoconApplicationConfig(ConfigFactory.load(path))
     })
     engine.start(true)
-    engine.application.api()
+    engine.application.service()
 
     return engine
 }

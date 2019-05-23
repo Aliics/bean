@@ -14,7 +14,7 @@ internal class VersionKtTest {
     internal fun `should respond with application version from config`() {
         val engine = setupTestEngineWithConfiguration("config-with-version.conf")
         with(engine) {
-            handleRequest(HttpMethod.Get, "/api/version").apply {
+            handleRequest(HttpMethod.Get, "/service/version").apply {
                 assertThat(response.content).isEqualTo("1.0.0-TEST")
             }
         }
@@ -24,7 +24,7 @@ internal class VersionKtTest {
     internal fun `should respond with 204 when config does not contain version`() {
         val engine = setupTestEngineWithConfiguration("config-without-version.conf")
         with(engine) {
-            handleRequest(HttpMethod.Get, "/api/version").apply {
+            handleRequest(HttpMethod.Get, "/service/version").apply {
                 assertThat(response.status()).isEqualTo(HttpStatusCode.NoContent)
             }
         }
@@ -34,7 +34,7 @@ internal class VersionKtTest {
     internal fun `should respond with 204 when config does not exist`() {
         val engine = setupTestEngineWithConfiguration("")
         with(engine) {
-            handleRequest(HttpMethod.Get, "/api/version").apply {
+            handleRequest(HttpMethod.Get, "/service/version").apply {
                 assertThat(response.status()).isEqualTo(HttpStatusCode.NoContent)
             }
         }

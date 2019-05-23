@@ -11,12 +11,14 @@ import io.ktor.server.netty.Netty
 import io.ktor.util.KtorExperimentalAPI
 import org.jetbrains.exposed.sql.Database
 
+private const val SERVICE_PATH = "service"
+
 fun main(args: Array<String>) {
     embeddedServer(Netty, commandLineEnvironment(args)).start(true)
 }
 
 @KtorExperimentalAPI
-fun Application.api() {
+fun Application.service() {
     if (environment.config.propertyOrNull("ktor.application.db") != null) {
         Database.connect(
             url = environment.config.propertyOrNull("ktor.application.db.url")?.getString() ?: "",
@@ -27,7 +29,7 @@ fun Application.api() {
     }
 
     routing {
-        route("api") {
+        route(SERVICE_PATH) {
             version()
             chat()
         }

@@ -42,7 +42,7 @@ internal class ChatKtTest {
         }
 
         with(engine) {
-            handleRequest(HttpMethod.Get, "/api/chat").apply {
+            handleRequest(HttpMethod.Get, "/service/chat").apply {
                 val expected = """[{"id":1,"content":"Hello, World!"},{"id":2,"content":"Hello, Person!"}]"""
                 assertThat(response.content).isEqualTo(expected)
             }
@@ -52,7 +52,7 @@ internal class ChatKtTest {
     @Test
     internal fun `should respond with empty when data in message table contain nothing`() {
         with(engine) {
-            handleRequest(HttpMethod.Get, "/api/chat").apply {
+            handleRequest(HttpMethod.Get, "/service/chat").apply {
                 assertThat(response.content).isEqualTo("[]")
             }
         }
@@ -70,7 +70,7 @@ internal class ChatKtTest {
         }
 
         with(engine) {
-            handleRequest(HttpMethod.Get, "/api/chat/2").apply {
+            handleRequest(HttpMethod.Get, "/service/chat/2").apply {
                 val expected = """[{"id":2,"content":"Hello, Person!"}]"""
                 assertThat(response.content).isEqualTo(expected)
             }
@@ -80,7 +80,7 @@ internal class ChatKtTest {
     @Test
     internal fun `should insert a message into messages when posting`() {
         with(engine) {
-            handleRequest(HttpMethod.Post, "/api/chat") {
+            handleRequest(HttpMethod.Post, "/service/chat") {
                 setBody("""{"content":"I'm the postman!"}""")
             }
         }
@@ -99,7 +99,7 @@ internal class ChatKtTest {
         }
 
         with(engine) {
-            handleRequest(HttpMethod.Post, "/api/chat") {
+            handleRequest(HttpMethod.Post, "/service/chat") {
                 setBody("""{"id":1,"content":"The final message!"}""")
             }
         }
@@ -114,7 +114,7 @@ internal class ChatKtTest {
     @Test
     internal fun `should respond with a bad request when there is no body content`() {
         with(engine) {
-            handleRequest(HttpMethod.Post, "/api/chat").apply {
+            handleRequest(HttpMethod.Post, "/service/chat").apply {
                 assertThat(response.status()).isEqualTo(HttpStatusCode.BadRequest)
             }
         }
@@ -123,7 +123,7 @@ internal class ChatKtTest {
     @Test
     internal fun `should respond with a bad request when body is malformed`() {
         with(engine) {
-            handleRequest(HttpMethod.Post, "/api/chat") {
+            handleRequest(HttpMethod.Post, "/service/chat") {
                 setBody("foobar")
             }.apply {
                 assertThat(response.status()).isEqualTo(HttpStatusCode.BadRequest)
@@ -138,7 +138,7 @@ internal class ChatKtTest {
         }
 
         with(engine) {
-            handleRequest(HttpMethod.Delete, "/api/chat/1")
+            handleRequest(HttpMethod.Delete, "/service/chat/1")
         }
 
         val result = transaction {
@@ -155,7 +155,7 @@ internal class ChatKtTest {
         }
 
         with(engine) {
-            handleRequest(HttpMethod.Delete, "/api/chat").apply {
+            handleRequest(HttpMethod.Delete, "/service/chat").apply {
                 assertThat(response.status()).isNull()
             }
         }
