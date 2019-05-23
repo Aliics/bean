@@ -8,6 +8,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.request.receiveText
 import io.ktor.response.respond
 import io.ktor.routing.Route
+import io.ktor.routing.delete
 import io.ktor.routing.get
 import io.ktor.routing.post
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -43,5 +44,20 @@ fun Route.chat() {
         } catch (e: Exception) {
             call.respond(HttpStatusCode.BadRequest)
         }
+    }
+    delete("$PATH/{id}") {
+        val id = call.parameters["id"]?.toInt()
+
+        if (id == null) {
+            call.respond(HttpStatusCode.BadRequest)
+            return@delete
+        }
+
+        transaction {
+            Message.findById(id)!!.delete()
+            commit()
+        }
+
+        call.respond(HttpStatusCode.OK)
     }
 }

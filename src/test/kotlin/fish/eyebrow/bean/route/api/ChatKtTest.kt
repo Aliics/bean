@@ -131,6 +131,36 @@ internal class ChatKtTest {
         }
     }
 
+    @Test
+    internal fun `should remove message from messages when requesting to delete with id`() {
+        transaction {
+            Message.new { content = "This should not be visible" }
+        }
+
+        with(engine) {
+            handleRequest(HttpMethod.Delete, "/api/chat/1")
+        }
+
+        val result = transaction {
+            Message.all().map { Message.Simple(it) }
+        }
+
+        assertThat(result).hasSize(0)
+    }
+
+    @Test
+    internal fun `should not send request when no id is provided to deletion`() {
+        transaction {
+            Message.new { content = "This should not be visible" }
+        }
+
+        with(engine) {
+            handleRequest(HttpMethod.Delete, "/api/chat").apply {
+                assertThat(response.status()).isNull()
+            }
+        }
+    }
+
     @AfterEach
     internal fun tearDown() {
         transaction {
