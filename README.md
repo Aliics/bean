@@ -1,2 +1,2 @@
 # bean
-_Another_ project in ktor.
+_Another_ ktor project, which is not the be confused with *Spring Beans*.
