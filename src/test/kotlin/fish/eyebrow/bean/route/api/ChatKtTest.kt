@@ -8,6 +8,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 
 @KtorExperimentalAPI
@@ -32,8 +33,6 @@ internal class ChatKtTest {
                 assertThat(response.content).isEqualTo(expected)
             }
         }
-
-        dropMessagesTable()
     }
 
     @Test
@@ -49,11 +48,32 @@ internal class ChatKtTest {
                 assertThat(response.content).isEqualTo("[]")
             }
         }
-
-        dropMessagesTable()
     }
 
-    private fun dropMessagesTable() {
+    @Test
+    internal fun `should fetch only specifically queries message when given id`() {
+        val engine = setupTestEngineWithConfiguration("configuration-with-db-setting.conf")
+
+        transaction {
+            SchemaUtils.create(Messages)
+            Messages.insert {
+                it[content] = "Hello, World!"
+            }
+            Messages.insert {
+                it[content] = "Hello, Person!"
+            }
+        }
+
+        with(engine) {
+            handleRequest(HttpMethod.Get, "/api/chat/2").apply {
+                val expected = """[{"id":2,"content":"Hello, Person!"}]"""
+                assertThat(response.content).isEqualTo(expected)
+            }
+        }
+    }
+
+    @AfterEach
+    internal fun tearDown() {
         transaction {
             SchemaUtils.drop(Messages)
         }
