@@ -1,5 +1,6 @@
 package fish.eyebrow.bean.route.api
 
+import fish.eyebrow.bean.util.setupTestEngineWithConfiguration
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.handleRequest

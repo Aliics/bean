@@ -2,6 +2,7 @@ package fish.eyebrow.bean.route.api
 
 import fish.eyebrow.bean.dao.Message
 import fish.eyebrow.bean.table.Messages
+import fish.eyebrow.bean.util.setupTestEngineWithConfiguration
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.TestApplicationEngine

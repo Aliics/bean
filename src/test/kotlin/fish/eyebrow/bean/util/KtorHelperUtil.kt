@@ -1,4 +1,4 @@
-package fish.eyebrow.bean.route.api
+package fish.eyebrow.bean.util
 
 import com.typesafe.config.ConfigFactory
 import fish.eyebrow.bean.api
