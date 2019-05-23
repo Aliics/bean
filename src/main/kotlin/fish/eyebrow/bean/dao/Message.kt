@@ -11,7 +11,7 @@ class Message(id: EntityID<Int>) : IntEntity(id) {
     var content by Messages.content
 
     class Simple(message: Message) {
-        private val id: Int = message.id.value
-        private val content: String = message.content
+        val id: Int = message.id.value
+        val content: String = message.content
     }
 }
