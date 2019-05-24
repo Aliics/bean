@@ -33,6 +33,8 @@ fun Route.chat() {
     post(PATH) {
         try {
             val sentMessage = Gson().fromJson(call.receiveText(), Message.Simple::class.java)
+            var statusCode = HttpStatusCode.OK
+
             transaction {
                 val groupId = sentMessage.group?.id ?: 0
                 val sentGroup = Group.findById(groupId)
@@ -46,24 +48,22 @@ fun Route.chat() {
                         content = sentMessage.content
                         this.group = sentGroup
                     }
-                    else -> call.response.status(HttpStatusCode.BadRequest)
+                    else -> statusCode = HttpStatusCode.BadRequest
                 }
                 commit()
             }
-            call.respond(HttpStatusCode.OK)
+            call.respond(statusCode)
         } catch (e: Exception) {
             call.respond(HttpStatusCode.BadRequest)
         }
     }
     delete("$PATH/{id}") {
-        val id = call.parameters["id"]?.toInt() ?: call.response.status(HttpStatusCode.BadRequest)
+        val id = call.parameters["id"]!!.toInt()
 
         try {
             transaction {
-                if (id is Int) {
-                    Message.findById(id)!!.delete()
-                    commit()
-                }
+                Message.findById(id)!!.delete()
+                commit()
             }
 
             call.respond(HttpStatusCode.OK)

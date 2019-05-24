@@ -157,6 +157,17 @@ internal class ChatKtTest {
     }
 
     @Test
+    internal fun `should respond with a bad request when group and id are not given`() {
+        with(engine) {
+            handleRequest(HttpMethod.Post, "/service/chat") {
+                setBody("""{"content":"The final message!"}""")
+            }.apply {
+                assertThat(response.status()).isEqualTo(HttpStatusCode.BadRequest)
+            }
+        }
+    }
+
+    @Test
     internal fun `should remove message from messages when requesting to delete with id`() {
         transaction {
             val groupObject = Group[1]
