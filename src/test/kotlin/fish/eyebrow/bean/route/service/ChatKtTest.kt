@@ -13,7 +13,6 @@ import io.ktor.server.testing.setBody
 import io.ktor.util.KtorExperimentalAPI
 import org.assertj.core.api.Assertions.assertThat
 import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -29,7 +28,7 @@ internal class ChatKtTest {
 
         transaction {
             SchemaUtils.create(Groups, Messages)
-            Groups.insert { }
+            Group.new {}
         }
     }
 
