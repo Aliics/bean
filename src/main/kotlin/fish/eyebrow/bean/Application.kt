@@ -1,7 +1,7 @@
 package fish.eyebrow.bean
 
-import fish.eyebrow.bean.route.api.chat
-import fish.eyebrow.bean.route.api.version
+import fish.eyebrow.bean.route.service.chat
+import fish.eyebrow.bean.route.service.version
 import io.ktor.application.Application
 import io.ktor.routing.route
 import io.ktor.routing.routing

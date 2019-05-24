@@ -1,4 +1,4 @@
-package fish.eyebrow.bean.route.api
+package fish.eyebrow.bean.route.service
 
 import io.ktor.application.application
 import io.ktor.application.call

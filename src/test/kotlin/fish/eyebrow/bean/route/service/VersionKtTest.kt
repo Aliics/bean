@@ -1,4 +1,4 @@
-package fish.eyebrow.bean.route.api
+package fish.eyebrow.bean.route.service
 
 import fish.eyebrow.bean.util.setupTestEngineWithConfiguration
 import io.ktor.http.HttpMethod

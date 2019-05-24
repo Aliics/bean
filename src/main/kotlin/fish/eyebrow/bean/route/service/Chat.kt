@@ -1,4 +1,4 @@
-package fish.eyebrow.bean.route.api
+package fish.eyebrow.bean.route.service
 
 import com.google.gson.Gson
 import fish.eyebrow.bean.dao.Group
