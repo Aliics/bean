@@ -1,6 +1,7 @@
 package fish.eyebrow.bean
 
 import fish.eyebrow.bean.route.service.chat
+import fish.eyebrow.bean.route.service.guild
 import fish.eyebrow.bean.route.service.version
 import io.ktor.application.Application
 import io.ktor.routing.route
@@ -25,6 +26,7 @@ fun Application.service() {
         route(SERVICE_PATH) {
             version()
             chat()
+            guild()
         }
     }
 }

@@ -230,7 +230,7 @@ internal class ChatKtTest {
     @AfterEach
     internal fun tearDown() {
         transaction {
-            SchemaUtils.drop(Messages)
+            SchemaUtils.drop(Groups, Messages)
         }
     }
 }
