@@ -12,10 +12,10 @@ import io.ktor.routing.get
 import io.ktor.routing.post
 import org.jetbrains.exposed.sql.transactions.transaction
 
-private const val PATH = "/guild"
+private const val PATH = "/group"
 
 
-fun Route.guild() {
+fun Route.group() {
     get("$PATH/{id?}") {
         val id = call.parameters["id"]?.toInt()
         

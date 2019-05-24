@@ -17,7 +17,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 @KtorExperimentalAPI
-internal class GuildKtTest {
+internal class GroupKtTest {
     @BeforeEach
     internal fun setUp() {
         engine = setupTestEngineWithConfiguration("configuration-with-db-setting.conf")
@@ -37,7 +37,7 @@ internal class GuildKtTest {
         }
 
         with(engine) {
-            handleRequest(HttpMethod.Get, "/service/guild").apply {
+            handleRequest(HttpMethod.Get, "/service/group").apply {
                 assertThat(response.content).isEqualTo("""[{"id":1},{"id":2}]""")
             }
         }
@@ -46,7 +46,7 @@ internal class GuildKtTest {
     @Test
     internal fun `should obtain an empty list when no groups are in table`() {
         with(engine) {
-            handleRequest(HttpMethod.Get, "/service/guild").apply {
+            handleRequest(HttpMethod.Get, "/service/group").apply {
                 assertThat(response.content).isEqualTo("""[]""")
             }
         }
@@ -60,7 +60,7 @@ internal class GuildKtTest {
         }
 
         with(engine) {
-            handleRequest(HttpMethod.Get, "/service/guild/2").apply {
+            handleRequest(HttpMethod.Get, "/service/group/2").apply {
                 assertThat(response.content).isEqualTo("""[{"id":2}]""")
             }
         }
@@ -69,7 +69,7 @@ internal class GuildKtTest {
     @Test
     internal fun `should obtain an empty list when id given does not exist`() {
         with(engine) {
-            handleRequest(HttpMethod.Get, "/service/guild/2").apply {
+            handleRequest(HttpMethod.Get, "/service/group/2").apply {
                 assertThat(response.content).isEqualTo("""[]""")
             }
         }
@@ -78,7 +78,7 @@ internal class GuildKtTest {
     @Test
     internal fun `should update table with new group when given an id that does not exist`() {
         with(engine) {
-            handleRequest(HttpMethod.Post, "/service/guild/1").apply {
+            handleRequest(HttpMethod.Post, "/service/group/1").apply {
                 assertThat(response.status()).isEqualTo(HttpStatusCode.OK)
 
             }
@@ -99,7 +99,7 @@ internal class GuildKtTest {
         }
 
         with(engine) {
-            handleRequest(HttpMethod.Post, "/service/guild/1").apply {
+            handleRequest(HttpMethod.Post, "/service/group/1").apply {
                 assertThat(response.status()).isEqualTo(HttpStatusCode.OK)
 
             }
@@ -116,7 +116,7 @@ internal class GuildKtTest {
     @Test
     internal fun `should respond with a bad request when not given an id`() {
         with(engine) {
-            handleRequest(HttpMethod.Post, "/service/guild/").apply {
+            handleRequest(HttpMethod.Post, "/service/group/").apply {
                 assertThat(response.status()).isEqualTo(HttpStatusCode.BadRequest)
             }
 
@@ -135,7 +135,7 @@ internal class GuildKtTest {
         }
 
         with(engine) {
-            handleRequest(HttpMethod.Delete, "/service/guild/1").apply {
+            handleRequest(HttpMethod.Delete, "/service/group/1").apply {
                 assertThat(response.status()).isEqualTo(HttpStatusCode.OK)
 
             }
@@ -155,7 +155,7 @@ internal class GuildKtTest {
         }
 
         with(engine) {
-            handleRequest(HttpMethod.Delete, "/service/guild/2").apply {
+            handleRequest(HttpMethod.Delete, "/service/group/2").apply {
                 assertThat(response.status()).isEqualTo(HttpStatusCode.NotFound)
 
             }
