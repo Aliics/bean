@@ -128,6 +128,46 @@ internal class GuildKtTest {
         }
     }
 
+    @Test
+    internal fun `should remove group from table if given an id that exists`() {
+        transaction {
+            Group.new { }
+        }
+
+        with(engine) {
+            handleRequest(HttpMethod.Delete, "/service/guild/1").apply {
+                assertThat(response.status()).isEqualTo(HttpStatusCode.OK)
+
+            }
+
+            transaction {
+                val groups = Group.all().toList()
+
+                assertThat(groups).hasSize(0)
+            }
+        }
+    }
+
+    @Test
+    internal fun `should respond with a 404 when no group is found with id`() {
+        transaction {
+            Group.new { }
+        }
+
+        with(engine) {
+            handleRequest(HttpMethod.Delete, "/service/guild/2").apply {
+                assertThat(response.status()).isEqualTo(HttpStatusCode.NotFound)
+
+            }
+
+            transaction {
+                val groups = Group.all().toList()
+
+                assertThat(groups).hasSize(1)
+            }
+        }
+    }
+
     @AfterEach
     internal fun tearDown() {
         transaction {

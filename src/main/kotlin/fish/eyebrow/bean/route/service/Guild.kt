@@ -7,6 +7,7 @@ import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
 import io.ktor.routing.Route
+import io.ktor.routing.delete
 import io.ktor.routing.get
 import io.ktor.routing.post
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -41,6 +42,19 @@ fun Route.guild() {
             call.respond(HttpStatusCode.OK)
         } else {
             call.respond(HttpStatusCode.BadRequest)
+        }
+    }
+    delete("$PATH/{id?}") {
+        val id = call.parameters["id"]?.toInt()
+
+        try {
+            transaction {
+                Group[id!!].delete()
+            }
+
+            call.respond(HttpStatusCode.OK)
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.NotFound)
         }
     }
 }
