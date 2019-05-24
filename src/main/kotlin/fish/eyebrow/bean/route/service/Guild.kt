@@ -18,6 +18,7 @@ private const val PATH = "/guild"
 fun Route.guild() {
     get("$PATH/{id?}") {
         val id = call.parameters["id"]?.toInt()
+        
         val result = transaction {
             if (id != null) {
                 Group.find { Groups.id eq id }.map { Group.Simple(it) }
