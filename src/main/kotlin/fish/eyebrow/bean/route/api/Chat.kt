@@ -1,6 +1,7 @@
 package fish.eyebrow.bean.route.api
 
 import com.google.gson.Gson
+import fish.eyebrow.bean.dao.Group
 import fish.eyebrow.bean.dao.Message
 import fish.eyebrow.bean.table.Messages
 import io.ktor.application.call
@@ -33,10 +34,19 @@ fun Route.chat() {
         try {
             val sentMessage = Gson().fromJson(call.receiveText(), Message.Simple::class.java)
             transaction {
-                if (sentMessage.id > 0) {
-                    Message[sentMessage.id].content = sentMessage.content
-                } else {
-                    Message.new { content = sentMessage.content }
+                val groupId = sentMessage.group?.id ?: 0
+                val sentGroup = Group.findById(groupId)
+
+                when {
+                    sentMessage.id > 0 -> Message[sentMessage.id].apply {
+                        content = sentMessage.content
+                        this.group = sentGroup ?: this.group
+                    }
+                    sentMessage.id == 0 && sentGroup != null -> Message.new {
+                        content = sentMessage.content
+                        this.group = sentGroup
+                    }
+                    else -> call.response.status(HttpStatusCode.BadRequest)
                 }
                 commit()
             }
@@ -46,18 +56,19 @@ fun Route.chat() {
         }
     }
     delete("$PATH/{id}") {
-        val id = call.parameters["id"]?.toInt()
+        val id = call.parameters["id"]?.toInt() ?: call.response.status(HttpStatusCode.BadRequest)
 
-        if (id == null) {
-            call.respond(HttpStatusCode.BadRequest)
-            return@delete
+        try {
+            transaction {
+                if (id is Int) {
+                    Message.findById(id)!!.delete()
+                    commit()
+                }
+            }
+
+            call.respond(HttpStatusCode.OK)
+        } catch (e: KotlinNullPointerException) {
+            call.respond(HttpStatusCode.NotFound)
         }
-
-        transaction {
-            Message.findById(id)!!.delete()
-            commit()
-        }
-
-        call.respond(HttpStatusCode.OK)
     }
 }

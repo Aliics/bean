@@ -1,6 +1,8 @@
 package fish.eyebrow.bean.route.api
 
+import fish.eyebrow.bean.dao.Group
 import fish.eyebrow.bean.dao.Message
+import fish.eyebrow.bean.table.Groups
 import fish.eyebrow.bean.table.Messages
 import fish.eyebrow.bean.util.setupTestEngineWithConfiguration
 import io.ktor.http.HttpMethod
@@ -26,24 +28,28 @@ internal class ChatKtTest {
         engine = setupTestEngineWithConfiguration("configuration-with-db-setting.conf")
 
         transaction {
-            SchemaUtils.create(Messages)
+            SchemaUtils.create(Groups, Messages)
+            Groups.insert { }
         }
     }
 
     @Test
     internal fun `should respond with the data in messages table`() {
         transaction {
-            Messages.insert {
-                it[content] = "Hello, World!"
+            val groupObject = Group[1]
+            Message.new {
+                content = "Hello, World!"
+                group = groupObject
             }
-            Messages.insert {
-                it[content] = "Hello, Person!"
+            Message.new {
+                content = "Hello, Person!"
+                group = groupObject
             }
         }
 
         with(engine) {
             handleRequest(HttpMethod.Get, "/service/chat").apply {
-                val expected = """[{"id":1,"content":"Hello, World!"},{"id":2,"content":"Hello, Person!"}]"""
+                val expected = """[{"id":1,"content":"Hello, World!","group":{"id":1}},{"id":2,"content":"Hello, Person!","group":{"id":1}}]"""
                 assertThat(response.content).isEqualTo(expected)
             }
         }
@@ -61,17 +67,20 @@ internal class ChatKtTest {
     @Test
     internal fun `should fetch only specifically queries message when given id`() {
         transaction {
-            Messages.insert {
-                it[content] = "Hello, World!"
+            val groupObject = Group[1]
+            Message.new {
+                content = "Hello, World!"
+                group = groupObject
             }
-            Messages.insert {
-                it[content] = "Hello, Person!"
+            Message.new {
+                content = "Hello, Person!"
+                group = groupObject
             }
         }
 
         with(engine) {
             handleRequest(HttpMethod.Get, "/service/chat/2").apply {
-                val expected = """[{"id":2,"content":"Hello, Person!"}]"""
+                val expected = """[{"id":2,"content":"Hello, Person!","group":{"id":1}}]"""
                 assertThat(response.content).isEqualTo(expected)
             }
         }
@@ -81,7 +90,7 @@ internal class ChatKtTest {
     internal fun `should insert a message into messages when posting`() {
         with(engine) {
             handleRequest(HttpMethod.Post, "/service/chat") {
-                setBody("""{"content":"I'm the postman!"}""")
+                setBody("""{"content":"I'm the postman!","group":{"id":1}}""")
             }
         }
 
@@ -93,9 +102,14 @@ internal class ChatKtTest {
     }
 
     @Test
-    internal fun `should update already existing message when body contains an id`() {
+    internal fun `should update already existing message when body contains an id and no group`() {
         transaction {
-            Message.new { content = "This should not be visible" }
+            val groupObject = Group[1]
+
+            Message.new {
+                content = "This should not be visible"
+                group = groupObject
+            }
         }
 
         with(engine) {
@@ -132,9 +146,24 @@ internal class ChatKtTest {
     }
 
     @Test
+    internal fun `should respond with a bad request when group is missing and not available`() {
+        with(engine) {
+            handleRequest(HttpMethod.Post, "/service/chat") {
+                setBody("""{"id":1,"content":"The final message!"}""")
+            }.apply {
+                assertThat(response.status()).isEqualTo(HttpStatusCode.BadRequest)
+            }
+        }
+    }
+
+    @Test
     internal fun `should remove message from messages when requesting to delete with id`() {
         transaction {
-            Message.new { content = "This should not be visible" }
+            val groupObject = Group[1]
+            Message.new {
+                content = "This should not be visible"
+                group = groupObject
+            }
         }
 
         with(engine) {
@@ -149,9 +178,36 @@ internal class ChatKtTest {
     }
 
     @Test
+    internal fun `should return 404 when requested message to delete does not exist`() {
+        transaction {
+            val groupObject = Group[1]
+            Message.new {
+                content = "This should be visible"
+                group = groupObject
+            }
+        }
+
+        with(engine) {
+            handleRequest(HttpMethod.Delete, "/service/chat/2").apply {
+                assertThat(response.status()).isEqualTo(HttpStatusCode.NotFound)
+            }
+        }
+
+        val result = transaction {
+            Message.all().map { Message.Simple(it) }
+        }
+
+        assertThat(result).hasSize(1)
+    }
+
+    @Test
     internal fun `should not send request when no id is provided to deletion`() {
         transaction {
-            Message.new { content = "This should not be visible" }
+            val groupObject = Group[1]
+            Message.new {
+                content = "This should not be visible"
+                group = groupObject
+            }
         }
 
         with(engine) {
