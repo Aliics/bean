@@ -19,6 +19,18 @@ fun main(args: Array<String>) {
 
 @KtorExperimentalAPI
 fun Application.service() {
+    configureDatabase()
+
+    routing {
+        route(SERVICE_PATH) {
+            version()
+            chat()
+        }
+    }
+}
+
+@KtorExperimentalAPI
+private fun Application.configureDatabase() {
     if (environment.config.propertyOrNull("ktor.application.db") != null) {
         Database.connect(
             url = environment.config.propertyOrNull("ktor.application.db.url")?.getString() ?: "",
@@ -26,12 +38,5 @@ fun Application.service() {
             user = environment.config.propertyOrNull("ktor.application.db.user")?.getString() ?: "",
             password = environment.config.propertyOrNull("ktor.application.db.password")?.getString() ?: ""
         )
-    }
-
-    routing {
-        route(SERVICE_PATH) {
-            version()
-            chat()
-        }
     }
 }
