@@ -4,9 +4,11 @@ import com.google.gson.Gson
 import fish.eyebrow.bean.dao.Group
 import fish.eyebrow.bean.table.Groups
 import io.ktor.application.call
+import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.get
+import io.ktor.routing.post
 import org.jetbrains.exposed.sql.transactions.transaction
 
 private const val PATH = "/guild"
@@ -25,5 +27,20 @@ fun Route.guild() {
         val resultJson = Gson().toJson(result)
 
         call.respond(resultJson)
+    }
+    post("$PATH/{id?}") {
+        val id = call.parameters["id"]?.toInt()
+
+        if (id != null) {
+            transaction {
+                if (Group.findById(id) == null) {
+                    Group.new(id) { }
+                }
+            }
+
+            call.respond(HttpStatusCode.OK)
+        } else {
+            call.respond(HttpStatusCode.BadRequest)
+        }
     }
 }

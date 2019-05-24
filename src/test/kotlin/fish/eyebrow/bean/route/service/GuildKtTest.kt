@@ -5,6 +5,7 @@ import fish.eyebrow.bean.table.Groups
 import fish.eyebrow.bean.table.Messages
 import fish.eyebrow.bean.util.setupTestEngineWithConfiguration
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
 import io.ktor.util.KtorExperimentalAPI
@@ -70,6 +71,59 @@ internal class GuildKtTest {
         with(engine) {
             handleRequest(HttpMethod.Get, "/service/guild/2").apply {
                 assertThat(response.content).isEqualTo("""[]""")
+            }
+        }
+    }
+
+    @Test
+    internal fun `should update table with new group when given an id that does not exist`() {
+        with(engine) {
+            handleRequest(HttpMethod.Post, "/service/guild/1").apply {
+                assertThat(response.status()).isEqualTo(HttpStatusCode.OK)
+
+            }
+
+            transaction {
+                val groups = Group.all().toList()
+
+                assertThat(groups).hasSize(1)
+                assertThat(groups[0].id.value).isEqualTo(1)
+            }
+        }
+    }
+
+    @Test
+    internal fun `should retain the exact same information with given id does exist`() {
+        transaction {
+            Group.new { }
+        }
+
+        with(engine) {
+            handleRequest(HttpMethod.Post, "/service/guild/1").apply {
+                assertThat(response.status()).isEqualTo(HttpStatusCode.OK)
+
+            }
+
+            transaction {
+                val groups = Group.all().toList()
+
+                assertThat(groups).hasSize(1)
+                assertThat(groups[0].id.value).isEqualTo(1)
+            }
+        }
+    }
+
+    @Test
+    internal fun `should respond with a bad request when not given an id`() {
+        with(engine) {
+            handleRequest(HttpMethod.Post, "/service/guild/").apply {
+                assertThat(response.status()).isEqualTo(HttpStatusCode.BadRequest)
+            }
+
+            transaction {
+                val groups = Group.all().toList()
+
+                assertThat(groups).isEmpty()
             }
         }
     }
